@@ -20,12 +20,13 @@ RTCZero rtc;
 // A UDP instance to let us send and receive packets over UDP
 GSMUDP Udp;
 
+// time vars
+
 struct GCell
 {
 	public:
 		char imei[50];
 
-		// initialises the SIM card and connects to network
 		void init()
 		{
 			Serial.println("[setup] Initialising SIM Card");
@@ -42,13 +43,10 @@ struct GCell
 				else
 				{
 					Serial.print(".");
-					neo.show(LOOP_ERROR, 0, 0);
-					neo.show(LED_WHITE, 0, 4);
 				}
 			}
 		}
 
-		// gets the GSM data such as device IMEI
 		void readGSMInfo()
 		{
 			String response;
@@ -66,7 +64,6 @@ GCell gsm;
 struct Time
 {
 	private:
-		// requests time from server
 		unsigned long sendNTPpacket(IPAddress &address)
 		{
 			memset(packetBuffer, 0, NTP_PACKET_SIZE);
@@ -84,7 +81,6 @@ struct Time
 			Udp.endPacket();
 		}
 
-		// process the response from the server
 		unsigned long getEpochTime()
 		{
 			Serial.println("[setup] asking server for time");
@@ -121,7 +117,6 @@ struct Time
 			}
 		}
 
-		// sync the onboard RTC to the time received
 		void synchRTC(unsigned long epoch)
 		{
 			Serial.println("[setup] Initialising RTC with Time");
@@ -135,7 +130,6 @@ struct Time
 		}
 
 	public:
-		// called to get time and set RTC accordingly
 		void set()
 		{
 			Serial.println("[setup] Starting connection to server");
@@ -158,7 +152,6 @@ struct Time
 			get(true);
 		}
 
-		// gets the current time from the RTC. @return string
 		String get(bool string) // a public loop to convert time to string
 		{
 			String time;
@@ -195,7 +188,6 @@ struct Time
 			return finalVal;
 		}
 
-		// gets the current time from the RTC. @return unsigned long
 		unsigned long get() // a public loop to convert time to string
 		{
 			String time;
@@ -238,7 +230,6 @@ Time rtctime;
 struct Location
 {
 	private:
-		// check location precision
 		bool checkLocation(double lat, double lng, double alt)
 		{
 			int rawLat = lat;
@@ -273,7 +264,6 @@ struct Location
 		double altitude = 0;
 		long gpsacc = 0;
 
-		// initialise the GNSS connection
 		void set()
 		{
 			Serial.println("");
@@ -283,7 +273,6 @@ struct Location
 			get();
 		}
 
-		// get the location
 		void get()
 		{
 			bool fixed = false;

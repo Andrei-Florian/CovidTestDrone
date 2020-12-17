@@ -1,16 +1,17 @@
 // User Settings
-bool debugging                              = false;    // set to true for debugging info
 int timeZone                                = 1;        // difference from GMT
+bool debugging                              = true;     // print debug data to the serial monitor
 
-// globals
-bool doorState                              = false;    // the state of the container
-bool lockMode                               = true;     // locked with PIN or without PIN
-bool showneo                                = true;     // Show Neopixel feedback
+// gloabls
+bool doorState                              = false;    // false for personal, true for enterprise
+bool lockMode                               = true;     // false for personal, true for enterprise
+bool showneo                                = true;     // false for personal, true for enterprise
 double telemetrySendInterval                = 10000;    // the rate at which data is sent to the backend
-double unlockPIN                            = 123456;   // The PIN to unlock the container
+double unlockPIN                            = 123456;   // the rate at which data is sent to the backend
 double keepConnectionAlive                  = 1000000;  // the time to keep the connection to backend alive for (has to be greater than sleep)
 double pinCheckTimeout                      = 10000;    // the amount of time after which the device exits 
-int sendsDoorState                          = -1;       // Keeps track if the doorState should be changed
+
+int sendsDoorState                          = -1;
 
 // Azure IoT Central device information
 bool updatePropertiesNow                    = false;
@@ -34,14 +35,18 @@ const int LED_GREEN          = 4;
 const int WAKEUP             = 5;
 
 // APN data
-static char PROGMEM GPRS_APN[]              = "";
+static char PROGMEM GPRS_APN[]              = "Hologram";
 static char PROGMEM GPRS_LOGIN[]            = "";
 static char PROGMEM GPRS_PASSWORD[]         = "";
 
 // Connection Pins for sensors
-const int neopixelPin = 4;
-const int buttonPin = 3;
-const int servoPin = 5;
+const int buttonPin = 1;
+const int servoPin = 2;
+const int rgb[] = {3, 4, 5};
+
+const int RED   = 0;
+const int GREEN = 1;
+const int BLUE  = 2;
 
 // Device properties being sent
 #define DEVICE_PROP_FW_VERSION              "1.0.0-20190704"
@@ -54,7 +59,7 @@ const int servoPin = 5;
 String telemetryPayload = 
 "{"
     "{LOCATION}, "
-    "\"batteryRemaining\": {batteryRemaining}, \"deviceLocationAccuracy\": {deviceLocationAccuracy}"
+    "\"deviceLocationAccuracy\": {deviceLocationAccuracy}"
 "}";
 
 String doorStatePayload = 

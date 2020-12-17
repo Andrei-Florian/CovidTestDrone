@@ -270,7 +270,6 @@ void handleTwinPropertyChange(String topicStr, String payloadStr)
     updatePropertiesNow = true;
 
     Serial.println("");
-    neo.hide(true);
     delay(1000);
 
     // send property changed to backend as property payload
@@ -428,16 +427,17 @@ void connectMQTT(String deviceId, String username, String password)
             servicesStatus[MQTT_STATUS] = DISCONNECTED;
             Serial.println("[IoT] IoT Hub connection error. MQTT rc=" + String(mqtt_client->state()));
 
-            neo.show(LOOP_ERROR, 0, 0);
+            rgbled.red();
             delay(500);
-            neo.show(LED_WHITE, 0, 12);
+            rgbled.white();
+
             delay(2000);
             retry++;
         }
 
         if(retry > 5)
         {
-            neo.show(DEV_ERROR, 0, 0);
+            rgbled.red();
             while(true);
         }
     }
@@ -483,4 +483,62 @@ String createIotHubSASToken(char *key, String url, long expire)
     delete(sha256);
 
     return (char*)F("SharedAccessSignature sr=") + url + (char*)F("&sig=") + urlEncode((const char*)encodedSign) + (char*)F("&se=") + String(expire);
+}
+
+void iotset()
+{
+    delay(100);
+
+    // connect to GSM network
+    Serial.println("[IoT] Getting IoT Hub host from Azure IoT DPS");
+    servicesStatus[DPS_STATUS] = PENDING;
+    
+    char hostName[64] = {0};
+    
+    // compute derived key
+    int keyLength = strlen(iotc_enrollmentKey);
+    int decodedKeyLength = base64_dec_len(iotc_enrollmentKey, keyLength);
+    char decodedKey[decodedKeyLength];
+    base64_decode(decodedKey, iotc_enrollmentKey, keyLength);
+    Sha256 *sha256 = new Sha256();
+    sha256->initHmac((const uint8_t*)decodedKey, (size_t)decodedKeyLength);
+    sha256->print(String(iotc_modelId).c_str());
+    char* sign = (char*) sha256->resultHmac();
+    memset(iotc_enrollmentKey, 0, sizeof(iotc_enrollmentKey)); 
+    base64_encode(iotc_enrollmentKey, sign, HASH_LENGTH);
+    delete(sha256);
+
+    getHubHostName((char*)iotc_scopeId, (char*)String(iotc_modelId).c_str(), (char*)iotc_enrollmentKey, hostName);
+    servicesStatus[DPS_STATUS] = CONNECTED;
+    
+    iothubHost = hostName;
+    Serial.println("");
+    Serial.println("[IoT] Hostname: " + String(hostName));
+
+    // create SAS token and user name for connecting to MQTT broker
+    mqttUrl = iothubHost + urlEncode(String((char*)F("/devices/") + String(iotc_modelId)).c_str());
+    String password = "";
+    long expire = rtctime.get() + 864000;
+    password = createIotHubSASToken(iotc_enrollmentKey, mqttUrl, expire);
+    userName = iothubHost + "/" + String(iotc_modelId) + (char*)F("/?api-version=2018-06-30");
+
+    // connect to the IoT Hub MQTT broker
+    mqtt_client = new PubSubClient(mqttSslClient);
+    mqtt_client->setServer(iothubHost.c_str(), 8883);
+    mqtt_client->setCallback(callback);
+    
+    connectMQTT(String(iotc_modelId), userName, password);
+    
+    // request full digital twin update
+    String topic = (String)IOT_TWIN_REQUEST_TWIN_TOPIC;
+    char buff[20];
+    topic.replace(F("{request_id}"), itoa(requestId, buff, 10));
+    twinRequestId = requestId;
+    requestId++;
+    servicesStatus[MQTT_STATUS] = TRANSMITTING;  ;
+    mqtt_client->publish(topic.c_str(), "");
+    servicesStatus[MQTT_STATUS] = CONNECTED;  ;
+    
+    // initialize timers
+    lastTelemetryMillis = millis();
 }
