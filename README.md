@@ -6,7 +6,7 @@ The application is built around a drone delivery system that allows individuals 
 
 The application consists of two parts: the drone delivery system itself and the assisting applications built around it. These systems will be briefly discussed below with the help of an abstract process diagram.
 
-![Cover Image](./Images/2.jpg)
+![Cover Image](./Images/2.png)
 
 For the purpose of this walk-through, the solution will be implemented by a private company. The first step in the process is the purchase of a test. In a private company model, the test will be sold to individuals online. The consumer can purchase the test via the provider’s website and then input their details (address, phone number, etc.). The consumer will then be required to select a time when the test can be shipped to them. The website can be considered an assisting application as it helps advertise the product’s presence and attract customers.
 
