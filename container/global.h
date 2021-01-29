@@ -100,8 +100,16 @@ struct Global
             double accuracy;
         };
 
+        struct Telemetry
+        {
+            double temperature;
+            double humidity;
+            bool testKitPresence;
+        };
+
         Location location;
-        
+        Telemetry telemetry;
+
 		// global functions
         void getGeo()
 		{
@@ -125,6 +133,7 @@ struct Global
 
             delay(500);
             
+            tempSensor.init(); // initialise the gy21 sensor
             get.init(); // initialise the sensors
 
 			gsm.init(); // initialise the GSM service
@@ -148,6 +157,11 @@ struct Global
         {
             // get the geolocation
             this->getGeo();
+
+            // get other Data
+            this->telemetry.temperature = tempSensor.temp();
+            this->telemetry.humidity = tempSensor.humidity();
+            this->telemetry.testKitPresence = breakBeamSensor.check();
         }
 
 		void printData()
@@ -233,6 +247,10 @@ struct IotCentral
             payload.replace(F("{alt}"), String(global.location.altitude, 7));
 
             payload.replace(F("{deviceLocationAccuracy}"), String(global.location.accuracy, 2));
+
+            payload.replace(F("{containerTemperature}"), String(global.telemetry.temperature, 2));
+            payload.replace(F("{containerHumidity}"), String(global.telemetry.humidity, 2));
+            payload.replace(F("{testKitPresence}"), String(global.telemetry.testKitPresence));
             
             Serial.println("[IoT] " + String(payload.c_str()));
             servicesStatus[MQTT_STATUS] = TRANSMITTING;  ;

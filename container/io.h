@@ -1,9 +1,16 @@
 #include <Keypad.h>
 #include <Wire.h> 
 #include <Servo.h>
+#include "SparkFunHTU21D.h"
+
+// temp and humidity
+HTU21D gy21;
 
 // Servo
 Servo servo;
+
+// Beam Brake
+const int brakeTreshold = 500; // value below which the device assumes beam is broken
 
 // Keypad
 const byte ROWS = 4; //four rows
@@ -17,7 +24,7 @@ char keys[ROWS][COLS] =
   {'x','0','x'}
 };
 
-byte rowPins[ROWS] = {7, 12, 11, 9};    //connect to the row pinouts of the keypad
+byte rowPins[ROWS] = {7, 14, 13, 9};    //connect to the row pinouts of the keypad
 byte colPins[COLS] = {8, 6, 10};        //connect to the column pinouts of the keypad
 
 Keypad customKeypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
@@ -187,3 +194,41 @@ struct Container
 };
 
 Container container;
+
+struct TempSensor
+{
+    public:
+        void init()
+        {
+            gy21.begin();
+        }
+
+        double temp()
+        {
+            return double(gy21.readTemperature());
+        }
+
+        double humidity()
+        {
+            return double(gy21.readHumidity());
+        }
+};
+
+TempSensor tempSensor;
+
+struct BreakBeamSensor
+{
+    private:
+        double getValue()
+        {
+            return analogRead(A2);
+        }
+
+    public:
+        bool check()
+        {
+            return getValue() > brakeTreshold ? false: true;
+        }
+};
+
+BreakBeamSensor breakBeamSensor;

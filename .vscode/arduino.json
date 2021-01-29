@@ -1,0 +1,4 @@
+{
+    "board": "arduino:samd:mkrgsm1400",
+    "sketch": "container\\container.ino"
+}

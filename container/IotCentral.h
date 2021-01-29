@@ -221,6 +221,7 @@ void handleTwinPropertyChange(String topicStr, String payloadStr)
                     boolTemp = json_object_get_boolean(root_obj, arr[i]);
                     showneo = boolTemp;
                     Serial.println("    showneo set to                      " + String(boolTemp));
+                    rgbled.off();
                     break;
                 case 2:
                     doubleTemp = json_object_get_number(root_obj, arr[i]);
@@ -508,19 +509,31 @@ void iotset()
     base64_encode(iotc_enrollmentKey, sign, HASH_LENGTH);
     delete(sha256);
 
-    getHubHostName((char*)iotc_scopeId, (char*)String(iotc_modelId).c_str(), (char*)iotc_enrollmentKey, hostName);
+    Serial.println("DEBUG - " + String(getHubHostName((char*)iotc_scopeId, (char*)String(iotc_modelId).c_str(), (char*)iotc_enrollmentKey, hostName)));
     servicesStatus[DPS_STATUS] = CONNECTED;
     
     iothubHost = hostName;
+    Serial.println("DEBUG - iothubHost - " + String(iothubHost));
+    Serial.println("DEBUG - hostName - " + String(hostName));
+
     Serial.println("");
     Serial.println("[IoT] Hostname: " + String(hostName));
 
     // create SAS token and user name for connecting to MQTT broker
     mqttUrl = iothubHost + urlEncode(String((char*)F("/devices/") + String(iotc_modelId)).c_str());
+    Serial.println("DEBUG - mqttUrl - " + String(mqttUrl));
+
     String password = "";
-    long expire = rtctime.get() + 864000;
+    long check = rtctime.get();
+    long expire = check + 864000;
+    Serial.println("DEBUG - check - " + String(check));
+    Serial.println("DEBUG - expire - " + String(expire));
+
     password = createIotHubSASToken(iotc_enrollmentKey, mqttUrl, expire);
     userName = iothubHost + "/" + String(iotc_modelId) + (char*)F("/?api-version=2018-06-30");
+
+    Serial.println("DEBUG - username - " + String(userName));
+    Serial.println("DEBUG - password - " + String(password));
 
     // connect to the IoT Hub MQTT broker
     mqtt_client = new PubSubClient(mqttSslClient);
