@@ -1,33 +1,32 @@
 #include <Keypad.h>
-#include <Wire.h> 
-#include <Servo.h>
+#include <Wire.h>
 #include "SparkFunHTU21D.h"
+#include "configure.h"
 
 // temp and humidity
 HTU21D gy21;
 
-// Servo
-Servo servo;
-
 // Beam Brake
 const int brakeTreshold = 500; // value below which the device assumes beam is broken
+
+// LDR
+const int LDRTreshold = 500; // value below which the device assumes the container is closed
 
 // Keypad
 const byte ROWS = 4; //four rows
 const byte COLS = 3; //three columns
 
-char keys[ROWS][COLS] = 
-{
-  {'1','2','3'},
-  {'4','5','6'},
-  {'7','8','9'},
-  {'x','0','x'}
-};
+char keys[ROWS][COLS] =
+    {
+        {'1', '2', '3'},
+        {'4', '5', '6'},
+        {'7', '8', '9'},
+        {'x', '0', 'x'}};
 
-byte rowPins[ROWS] = {7, 14, 13, 9};    //connect to the row pinouts of the keypad
-byte colPins[COLS] = {8, 6, 10};        //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {7, 14, 13, 9}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {8, 6, 10};     //connect to the column pinouts of the keypad
 
-Keypad customKeypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+Keypad customKeypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // functions
 struct RGBLed
@@ -41,7 +40,7 @@ struct RGBLed
 
     void white()
     {
-        if(showneo)
+        if (showneo)
         {
             digitalWrite(rgb[RED], HIGH);
             digitalWrite(rgb[GREEN], HIGH);
@@ -51,7 +50,7 @@ struct RGBLed
 
     void red()
     {
-        if(showneo)
+        if (showneo)
         {
             digitalWrite(rgb[RED], HIGH);
             digitalWrite(rgb[GREEN], LOW);
@@ -61,7 +60,7 @@ struct RGBLed
 
     void green()
     {
-        if(showneo)
+        if (showneo)
         {
             digitalWrite(rgb[RED], LOW);
             digitalWrite(rgb[GREEN], HIGH);
@@ -71,7 +70,7 @@ struct RGBLed
 
     void blue()
     {
-        if(showneo)
+        if (showneo)
         {
             digitalWrite(rgb[RED], LOW);
             digitalWrite(rgb[GREEN], LOW);
@@ -81,19 +80,16 @@ struct RGBLed
 
     void off()
     {
-        if(showneo)
-        {
-            digitalWrite(rgb[RED], LOW);
-            digitalWrite(rgb[GREEN], LOW);
-            digitalWrite(rgb[BLUE], LOW);
-        }
+        digitalWrite(rgb[RED], LOW);
+        digitalWrite(rgb[GREEN], LOW);
+        digitalWrite(rgb[BLUE], LOW);
     }
 
     void check()
     {
-        if(showneo)
+        if (showneo)
         {
-            if(doorState) // green led if the door is open
+            if (doorState) // green led if the door is open
             {
                 green();
             }
@@ -102,6 +98,10 @@ struct RGBLed
                 red();
             }
         }
+        else // turn the LED off if LED feedback is disabled
+        {
+            off();
+        }
     }
 };
 
@@ -109,126 +109,145 @@ RGBLed rgbled;
 
 struct Get
 {
-    private:
+private:
+public:
+    void init()
+    {
+        pinMode(buttonPin, INPUT);
+    }
 
-    public:
-        void init()
+    // get button state
+    bool button()
+    {
+        if (digitalRead(buttonPin) == HIGH)
         {
-            pinMode(buttonPin, INPUT);
-        }
+            rgbled.blue();
+            while (digitalRead(buttonPin) == HIGH)
+                ;
+            rgbled.off();
 
-        // get button state 
-        bool button()
-        {
-            if(digitalRead(buttonPin) == HIGH)
-            {
-                rgbled.blue();
-                while(digitalRead(buttonPin) == HIGH);
-                rgbled.off();
-
-                return true;
-            }
-            return false;
+            return true;
         }
+        return false;
+    }
 };
 
 Get get;
 
-struct ServoControl
+struct LockControl
 {
-    private:
-        const int CLOSE_ANGLE = 180;
-        const int OPEN_ANGLE = 90;
+public:
+    void open()
+    {
+        Serial.println("[loop] Unlocking Container");
 
-    public:
-        void open()
-        {
-            servo.write(OPEN_ANGLE);
-            delay(2000);
-        }
+        // unlock the container
+        digitalWrite(lockPin, LOW);
+        delay(2000);
+    }
 
-        void close()
-        {
-            servo.write(CLOSE_ANGLE);
-            delay(2000);
-        }
+    void close()
+    {
+        Serial.println("[loop] Locking Container");
 
-        void init()
-        {
-            servo.attach(servoPin);
-        }
+        // lock the container
+        digitalWrite(lockPin, HIGH);
+        delay(2000);
+    }
+
+    void init()
+    {
+        // initialize the lock device
+        pinMode(lockPin, OUTPUT);
+        Serial.println("[setup] Lock Control Initiated");
+    }
 };
 
-ServoControl servoControl;
+LockControl lockControl;
 
 struct Container
 {
-    private:
-        bool firstTime = true;
+private:
+    bool firstTime = true;
 
-    public:
-        void open()
+public:
+    void open()
+    {
+        if (doorState == DOOR_CLOSE)
         {
-            if(doorState == DOOR_CLOSE)
-            {
-                Serial.println("[loop] Opening Container");
-                servoControl.open();
-            }
+            lockControl.open();
         }
+    }
 
-        void close()
+    void close()
+    {
+        if (doorState == DOOR_OPEN || firstTime)
         {
-            if(doorState == DOOR_OPEN || firstTime)
-            {
-                Serial.println("[loop] Closing Container");
-                servoControl.close();
-                firstTime = false;
-            }
+            lockControl.close();
+            firstTime = false;
         }
+    }
 
-        void init()
-        {
-            servoControl.init();
-            servoControl.close();
-        }
+    void init()
+    {
+        lockControl.init();
+        lockControl.close();
+    }
 };
 
 Container container;
 
 struct TempSensor
 {
-    public:
-        void init()
-        {
-            gy21.begin();
-        }
+public:
+    void init()
+    {
+        gy21.begin();
+    }
 
-        double temp()
-        {
-            return double(gy21.readTemperature());
-        }
+    double temp()
+    {
+        return double(gy21.readTemperature());
+    }
 
-        double humidity()
-        {
-            return double(gy21.readHumidity());
-        }
+    double humidity()
+    {
+        return double(gy21.readHumidity());
+    }
 };
 
 TempSensor tempSensor;
 
 struct BreakBeamSensor
 {
-    private:
-        double getValue()
-        {
-            return analogRead(A2);
-        }
+private:
+    double getValue()
+    {
+        return analogRead(breakbeamPin);
+    }
 
-    public:
-        bool check()
-        {
-            return getValue() > brakeTreshold ? false: true;
-        }
+public:
+    bool check()
+    {
+        return getValue() > brakeTreshold ? false : true;
+    }
 };
 
 BreakBeamSensor breakBeamSensor;
+
+struct LDRSensor
+{
+private:
+    int getValue()
+    {
+        return analogRead(ldrPin);
+    }
+
+public:
+    bool check()
+    {
+        return getValue() > brakeTreshold ? true : false;
+    }
+};
+
+LDRSensor ldrSensor;

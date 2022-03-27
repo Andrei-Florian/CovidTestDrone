@@ -1,0 +1,361 @@
+[
+  {
+    "@id": "dtmi:covidtestdrone:CovidTestDrone_52r;1",
+    "@type": "Interface",
+    "contents": [],
+    "displayName": {
+      "en": "CovidTestDrone"
+    },
+    "extends": [
+      "dtmi:covidtestdrone:CovidTestDrone_60r;1",
+      "dtmi:covidtestdrone:CovidTestDrone_5ow;1",
+      "dtmi:covidtestdrone:CovidTestDrone_61t;1",
+      "dtmi:covidtestdrone:CovidTestDrone_4yp;1"
+    ],
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ]
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:covidtestdrone:CovidTestDrone_60r;1",
+    "@type": [
+      "Interface",
+      "NamedInterface"
+    ],
+    "contents": [
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_60r:deviceLocation;1",
+        "@type": [
+          "Telemetry",
+          "Location"
+        ],
+        "description": {
+          "en": "The geolocation of the container."
+        },
+        "displayName": {
+          "en": "Device Location"
+        },
+        "name": "deviceLocation",
+        "schema": "geopoint"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_60r:deviceLocationAccuracy;1",
+        "@type": [
+          "Telemetry",
+          "Distance"
+        ],
+        "description": {
+          "en": "The accuracy of the geolocation data."
+        },
+        "displayName": {
+          "en": "Device Location Accuracy"
+        },
+        "name": "deviceLocationAccuracy",
+        "schema": "double",
+        "unit": "metre"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_60r:actionLocation;1",
+        "@type": [
+          "Telemetry",
+          "Location"
+        ],
+        "description": {
+          "en": "The geolocation of the drone when the container was last locked/unlocked."
+        },
+        "displayName": {
+          "en": "Action Location"
+        },
+        "name": "actionLocation",
+        "schema": "geopoint"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_60r:actionLocationAccuracy;1",
+        "@type": [
+          "Telemetry",
+          "Distance"
+        ],
+        "description": {
+          "en": "The accuracy of the geolocation data."
+        },
+        "displayName": {
+          "en": "Action Location Accuracy"
+        },
+        "name": "actionLocationAccuracy",
+        "schema": "double",
+        "unit": "metre"
+      }
+    ],
+    "displayName": {
+      "en": "Geolocation"
+    },
+    "name": "CovidTestDrone_60r"
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow;1",
+    "@type": [
+      "Interface",
+      "NamedInterface"
+    ],
+    "contents": [
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow:containerTemperature;1",
+        "@type": [
+          "Telemetry",
+          "Temperature"
+        ],
+        "description": {
+          "en": "The temperature recorded inside the container."
+        },
+        "displayName": {
+          "en": "Container Temperature"
+        },
+        "name": "containerTemperature",
+        "schema": "double",
+        "unit": "degreeCelsius"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow:containerHumidity;1",
+        "@type": [
+          "Telemetry",
+          "Humidity"
+        ],
+        "description": {
+          "en": "The humidity recorded inside the container."
+        },
+        "displayName": {
+          "en": "Container Humidity"
+        },
+        "name": "containerHumidity",
+        "schema": "double",
+        "unit": "percent"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow:testKitPresence;1",
+        "@type": "Telemetry",
+        "description": {
+          "en": "Depicts whether or not the test kit is present in the container."
+        },
+        "displayName": {
+          "en": "Test Kit Presence"
+        },
+        "name": "testKitPresence",
+        "schema": "boolean"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow:containerState;1",
+        "@type": "Telemetry",
+        "description": {
+          "en": "Depicts whether or not the container is locked."
+        },
+        "displayName": {
+          "en": "Container Lock State"
+        },
+        "name": "containerState",
+        "schema": "boolean"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_5ow:containerDoorState;1",
+        "@type": "Telemetry",
+        "description": {
+          "en": "Depicts whether or not the door of the container is open."
+        },
+        "displayName": {
+          "en": "Container Door State"
+        },
+        "name": "containerDoorState",
+        "schema": "boolean"
+      }
+    ],
+    "displayName": {
+      "en": "Telemetry"
+    },
+    "name": "CovidTestDrone_5ow"
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:covidtestdrone:CovidTestDrone_61t;1",
+    "@type": [
+      "Interface",
+      "NamedInterface"
+    ],
+    "contents": [
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_61t:telemetrySendInterval;1",
+        "@type": [
+          "Property",
+          "TimeSpan"
+        ],
+        "description": {
+          "en": "The interval of time between telemetry reports."
+        },
+        "displayName": {
+          "en": "Telemetry Reporting Interval"
+        },
+        "name": "telemetrySendInterval",
+        "schema": "double",
+        "unit": "millisecond",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_61t:unlockPIN;1",
+        "@type": "Property",
+        "description": {
+          "en": "The PIN used to unlock the container."
+        },
+        "displayName": {
+          "en": "Container Unlock Pin"
+        },
+        "name": "unlockPIN",
+        "schema": "integer",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_61t:lockMode;1",
+        "@type": "Property",
+        "description": {
+          "en": "Depicts whether or not the container requires a PIN to be unlocked."
+        },
+        "displayName": {
+          "en": "Container Unlock Option"
+        },
+        "name": "lockMode",
+        "schema": "boolean",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_61t:changeDoorState;1",
+        "@type": "Command",
+        "description": {
+          "en": "Lock/unlock the container remotely."
+        },
+        "displayName": {
+          "en": "Container Lock Command"
+        },
+        "name": "changeDoorState",
+        "request": {
+          "@type": "CommandPayload",
+          "displayName": {
+            "en": "Container Lock Command"
+          },
+          "name": "changeDoorState",
+          "schema": "boolean"
+        },
+        "durable": true
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_61t:ledFeedback;1",
+        "@type": "Property",
+        "description": {
+          "en": "Depicts whether or not the container provides feedback through the RGB LED."
+        },
+        "displayName": {
+          "en": "LED Feedback"
+        },
+        "name": "ledFeedback",
+        "schema": "boolean",
+        "writable": true
+      }
+    ],
+    "displayName": {
+      "en": "Settings"
+    },
+    "name": "CovidTestDrone_61t"
+  },
+  {
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ],
+    "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp;1",
+    "@type": [
+      "Interface",
+      "NamedInterface"
+    ],
+    "contents": [
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:manufacturer;1",
+        "@type": "Property",
+        "description": {
+          "en": "The device's manufacturer."
+        },
+        "displayName": {
+          "en": "Device Manufacturer"
+        },
+        "name": "manufacturer",
+        "schema": "string",
+        "writable": false
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:model;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Device Model"
+        },
+        "name": "model",
+        "schema": "string"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:processorManufacturer;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Processor Manufacturer"
+        },
+        "name": "processorManufacturer",
+        "schema": "string"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:processorType;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Processor Type"
+        },
+        "name": "processorType",
+        "schema": "string"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:fwVersion;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Firmware Version"
+        },
+        "name": "fwVersion",
+        "schema": "string"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:serialNumber;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Device Serial Number"
+        },
+        "name": "serialNumber",
+        "schema": "string"
+      },
+      {
+        "@id": "dtmi:covidtestdrone:CovidTestDrone_4yp:imei;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Device IMEI"
+        },
+        "name": "imei",
+        "schema": "string"
+      }
+    ],
+    "displayName": {
+      "en": "Device Properties"
+    },
+    "name": "CovidTestDrone_4yp"
+  }
+]
